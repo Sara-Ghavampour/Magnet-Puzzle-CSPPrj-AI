@@ -1,5 +1,8 @@
+######### sara Ghavampour   9812762781
+
 from square import *
 from Board import *
+from CSP_Solver import *
 
 def main():
     input_lines=open("input.txt").readlines()
@@ -18,7 +21,7 @@ def main():
         row = [int(number)for number in input_lines[i].split()]
         sqr_list=[]
         for j in range(0,len(row)):
-            sqr = square(i,j,row[j])
+            sqr = square(i-5,j,row[j])
             sqr_list.append(sqr)
 
         Board.board.append(sqr_list)
@@ -33,7 +36,7 @@ def main():
     # print("col_positive_bound: ",Board.col_positive_bound)
     # print("col_negative_bound: ",Board.col_negative_bound)
 
-
+    backTrack_Csp(Board.board)
 
 
 def print_board(board):

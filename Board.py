@@ -1,5 +1,5 @@
 class Board:
-    board = []   #2D
+    board = []   #2D   # each element is a square
     row_positive_bound=None
     row_negative_bound=None
     col_positive_bound=None
