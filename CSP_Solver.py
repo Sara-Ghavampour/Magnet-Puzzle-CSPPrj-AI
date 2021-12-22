@@ -66,7 +66,7 @@ def backTrack_Csp(board):
     print(" domain of pairsqr: ",pairSqr.domain_square)
 
     ### iterate the domain : 
-    for i in range (1):
+    for i in range (len(sqr.domain_square)):
     #for i in range (len(sqr.domain_square)):
         sqr_value = board[sqr.x][sqr.y].domain_square[i]
         curr_board = copy.deepcopy(board)
@@ -75,6 +75,8 @@ def backTrack_Csp(board):
         # pairSqr_copy =copy.deepcopy(pairSqr) 
         if sqr_value=='+':
             pair_value='-'
+            # curr_board[sqr.x][sqr.y].domain_square.remove(sqr_value)
+            # curr_board[pairSqr.x][pairSqr.y].domain_square.remove(pair_value)
         elif sqr_value=='-':
             pair_value='+'
         elif sqr_value=='0':
@@ -90,13 +92,14 @@ def backTrack_Csp(board):
         ## remove these values from domain
         print("new domain fo sqr before remove : ",curr_board[sqr.x][sqr.y].domain_square)
           
-
-        if sqr_value in curr_board[sqr.x][sqr.y].domain_square:
+        print("new domain of pairsqr before remove before if: ",curr_board[pairSqr.x][pairSqr.y].domain_square,pairSqr.x)  
+        if curr_board[sqr.x][sqr.y].magnet_value in curr_board[sqr.x][sqr.y].domain_square:
             print("*")
             curr_board[sqr.x][sqr.y].domain_square.remove(sqr_value)
             print("new domain fo sqr afterrr remove: ",curr_board[sqr.x][sqr.y].domain_square,sqr.x)
         print("new domain of pairsqr before remove : ",curr_board[pairSqr.x][pairSqr.y].domain_square,pairSqr.x)  
-        if pair_value in curr_board[pairSqr.x][pairSqr.y].domain_square:
+        print(" some arbittt: ",curr_board[3][3].domain_square , 3)  
+        if curr_board[pairSqr.x][pairSqr.y].magnet_value in curr_board[pairSqr.x][pairSqr.y].domain_square:
             print("**")
             curr_board[pairSqr.x][pairSqr.y].domain_square.remove(pair_value)
             print("new domain of pairsqr  afterrr remove: ",curr_board[pairSqr.x][pairSqr.y].domain_square)
@@ -104,5 +107,5 @@ def backTrack_Csp(board):
         print("new domain fo sqr: ",curr_board[sqr.x][sqr.y].domain_square)
         print("new domain of pairsqr : ",curr_board[pairSqr.x][pairSqr.y].domain_square)
 
-        print("Sqr : ",sqr.x,sqr.y,curr_board[sqr.x][sqr.y].magnet_value)
-        print("pairSqr : ",pairSqr.x,pairSqr.y,curr_board[pairSqr.x][pairSqr.y].magnet_value )
+        print("Sqr : ",sqr.x,sqr.y,curr_board[sqr.x][sqr.y].magnet_value,curr_board[sqr.x][sqr.y].value)
+        print("pairSqr : ",pairSqr.x,pairSqr.y,curr_board[pairSqr.x][pairSqr.y].magnet_value,curr_board[pairSqr.x][pairSqr.y].value )
