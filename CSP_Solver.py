@@ -35,7 +35,8 @@ def mrv_Heuristic(board):
     for i in range (len(board)):
         for j in range(len(board[0])):
             #print("len(board[i][j].domain_square) ",len(board[i][j].domain_square))
-            #print("len(board[i][j].domain_square) ",len(board[i][j].domain_square))
+            
+           # print("len(board[i][j].domain_square) ",len(board[i][j].domain_square))
             if len(board[i][j].domain_square) < min  and len(board[i][j].domain_square) != 0 and board[i][j].magnet_value==None: 
                 min = len(board[i][j].domain_square)
                 sqr=board[i][j]
@@ -215,13 +216,13 @@ def backTrack_Csp(board):
        
           
         
-        # if curr_board[sqr.x][sqr.y].magnet_value in curr_board[sqr.x][sqr.y].domain_square:
+        if curr_board[sqr.x][sqr.y].magnet_value in curr_board[sqr.x][sqr.y].domain_square:
             
-        #     curr_board[sqr.x][sqr.y].domain_square.remove(sqr_value)
+            curr_board[sqr.x][sqr.y].domain_square.remove(curr_board[sqr.x][sqr.y].magnet_value)
         
-        # if curr_board[pairSqr.x][pairSqr.y].magnet_value in curr_board[pairSqr.x][pairSqr.y].domain_square:
+        if curr_board[pairSqr.x][pairSqr.y].magnet_value in curr_board[pairSqr.x][pairSqr.y].domain_square:
            
-        #     curr_board[pairSqr.x][pairSqr.y].domain_square.remove(pair_value)
+            curr_board[pairSqr.x][pairSqr.y].domain_square.remove(curr_board[pairSqr.x][pairSqr.y].magnet_value )
         #if is_consistent(curr_board,curr_board[pairSqr.x][pairSqr.y],curr_board[pairSqr.x][pairSqr.y]):
         if(backTrack_Csp(curr_board)):
             return True
