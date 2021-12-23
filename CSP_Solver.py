@@ -1,4 +1,5 @@
 import math
+from Board import Board
 from square import *
 import copy
 def assignment_is_done(board):  # check termination of backtracking  # is complete
@@ -6,9 +7,18 @@ def assignment_is_done(board):  # check termination of backtracking  # is comple
         for j in range(len(board[0])):
             if board[i][j].magnet_value==None : 
                 return False
-
+    if not satisfaction_test(board):
+        return False
     return True 
 
+
+def all_checked(board):  # check termination of backtracking  # is complete
+    for i in range(len(board)):
+        for j in range(len(board[0])):
+            if board[i][j].magnet_value==None : 
+                return False
+   
+    return True 
 
 
 def print_board(board):
@@ -24,6 +34,7 @@ def mrv_Heuristic(board):
     min = math.inf 
     for i in range (len(board)):
         for j in range(len(board[0])):
+            #print("len(board[i][j].domain_square) ",len(board[i][j].domain_square))
             #print("len(board[i][j].domain_square) ",len(board[i][j].domain_square))
             if len(board[i][j].domain_square) < min  and len(board[i][j].domain_square) != 0 and board[i][j].magnet_value==None: 
                 min = len(board[i][j].domain_square)
@@ -57,27 +68,28 @@ def check_consistency_with_neibours(board,sqr,pairSqr):  ### ?????
     y=sqr.y
     x_pair= pairSqr.x
     y_pair=pairSqr.y
-    if x-1>=0 and board[x-1][y].magnet_value == sqr.magnet_value :
-        return False
-    elif x+1<n and board[x+1][y].magnet_value == sqr.magnet_value :
-        return False
-    elif y-1>=0 and board[x][y-1].magnet_value == sqr.magnet_value :
-        return False
-    elif y+1<n and board[x][y+1].magnet_value == sqr.magnet_value :
-        return False
+    if sqr.magnet_value!=None :
+        if x-1>=0 and board[x-1][y].magnet_value == sqr.magnet_value :
+            return False
+        elif x+1<n and board[x+1][y].magnet_value == sqr.magnet_value :
+            return False
+        elif y-1>=0 and board[x][y-1].magnet_value == sqr.magnet_value :
+            return False
+        elif y+1<n and board[x][y+1].magnet_value == sqr.magnet_value :
+            return False
+    if pairSqr.magnet_value!=None :
+        if x_pair-1>=0 and board[x_pair-1][y_pair].magnet_value == pairSqr.magnet_value :
+            return False
+        elif x_pair+1<n and board[x_pair+1][y_pair].magnet_value == pairSqr.magnet_value :
+            return False
+        elif y_pair-1>=0 and board[x_pair][y_pair-1].magnet_value == pairSqr.magnet_value :
+            return False
+        elif y_pair+1<n and board[x_pair][y_pair+1].magnet_value == pairSqr.magnet_value :
+            return False    
 
-    if x_pair-1>=0 and board[x_pair-1][y_pair].magnet_value == pairSqr.magnet_value :
-        return False
-    elif x_pair+1<n and board[x_pair+1][y_pair].magnet_value == pairSqr.magnet_value :
-        return False
-    elif y_pair-1>=0 and board[x_pair][y_pair-1].magnet_value == pairSqr.magnet_value :
-        return False
-    elif y_pair+1<n and board[x_pair][y_pair+1].magnet_value == pairSqr.magnet_value :
-        return False    
 
-
-    else :
-        return True
+    
+    return True
 
 
 def is_consistent(board,sqr,pairSqr):
@@ -90,13 +102,13 @@ def is_consistent(board,sqr,pairSqr):
     if check_consistency_with_neibours(board,sqr,pairSqr) == False :
         return False
 
-    for i in range((0,n)):  ## rows
+    for i in range(0,n):  ## rows
         p_row=0
         n_row=0
         for j in range(0,m):
             if board[i][j].magnet_value=='+': p_row+=1
             if board[i][j].magnet_value=='-': n_row+=1
-        if p_row>board.row_positive_bound or n_row >board.row_negative_bound:
+        if p_row>Board.row_positive_bound[i] or n_row >Board.row_negative_bound[i]:
             return False
 
 
@@ -107,10 +119,43 @@ def is_consistent(board,sqr,pairSqr):
             if board[i][j].magnet_value=='+': p_col+=1
             if board[i][j].magnet_value=='-': n_col+=1
 
-        if p_col> board.col_positive_bound or n_col> board.col_negative_bound:
+        if p_col> Board.col_positive_bound[j] or n_col> Board.col_negative_bound[j]:
             return False
 
-    return True    
+    return True 
+
+
+
+def satisfaction_test(board):
+    n = len(board)  ## rows
+    m = len(board[0])  ## cols
+    p_row =0
+    n_row =0
+    p_col=0
+    n_col=0
+   
+
+    for i in range(0,n):  ## rows
+        p_row=0
+        n_row=0
+        for j in range(0,m):
+            if board[i][j].magnet_value=='+': p_row+=1
+            if board[i][j].magnet_value=='-': n_row+=1
+        if p_row!=Board.row_positive_bound[i] or n_row !=Board.row_negative_bound[i]:
+            return False
+
+
+    for j in range(0,m): ## cols
+        p_col=0
+        n_col=0
+        for i in range (0,n):
+            if board[i][j].magnet_value=='+': p_col+=1
+            if board[i][j].magnet_value=='-': n_col+=1
+
+        if p_col!= Board.col_positive_bound[j] or n_col!= Board.col_negative_bound[j]:
+            return False
+
+    return True         
 
 
 
@@ -121,9 +166,22 @@ def backTrack_Csp(board):
         print("assignment_is_done: ")
         print_board(board)
         return True
-
+    if all_checked(board):
+        return False
     sqr = mrv_Heuristic(board)
+    #flag=False
+    # for i in range (0,len(board)):
+        
+    #     for j in range(0,len(board[0])):
+    #         if board[i][j].magnet_value ==None :
+    #             sqr = board[i][j]
+    #             flag = True
+    #             break
+    #     if flag:
+    #         break        
     pairSqr = get_the_pair(sqr,board)
+    if not is_consistent(board,sqr,pairSqr):
+        return False
     print("Sqr : ",sqr.x,sqr.y,sqr.value)
     print("pairSqr : ",pairSqr.x,pairSqr.y,pairSqr.value)
     print(" domain fo sqr: ",sqr.domain_square)
@@ -154,25 +212,20 @@ def backTrack_Csp(board):
         print("curr pairsgr value : ",curr_board[pairSqr.x][pairSqr.y].magnet_value)
 
         ## remove these values from domain
-        print("new domain fo sqr before remove : ",curr_board[sqr.x][sqr.y].domain_square)
+       
           
-        print("new domain of pairsqr before remove before if: ",curr_board[pairSqr.x][pairSqr.y].domain_square,pairSqr.x)  
-        if curr_board[sqr.x][sqr.y].magnet_value in curr_board[sqr.x][sqr.y].domain_square:
-            print("*")
-            curr_board[sqr.x][sqr.y].domain_square.remove(sqr_value)
-            print("new domain fo sqr afterrr remove: ",curr_board[sqr.x][sqr.y].domain_square,sqr.x)
-        print("new domain of pairsqr before remove : ",curr_board[pairSqr.x][pairSqr.y].domain_square,pairSqr.x)  
-        print(" some arbittt: ",curr_board[3][3].domain_square , 3)  
-        if curr_board[pairSqr.x][pairSqr.y].magnet_value in curr_board[pairSqr.x][pairSqr.y].domain_square:
-            print("**")
-            curr_board[pairSqr.x][pairSqr.y].domain_square.remove(pair_value)
-            print("new domain of pairsqr  afterrr remove: ",curr_board[pairSqr.x][pairSqr.y].domain_square)
-
-        print("new domain fo sqr: ",curr_board[sqr.x][sqr.y].domain_square)
-        print("new domain of pairsqr : ",curr_board[pairSqr.x][pairSqr.y].domain_square)
-
-        print("Sqr : ",sqr.x,sqr.y,curr_board[sqr.x][sqr.y].magnet_value,curr_board[sqr.x][sqr.y].value)
-        print("pairSqr : ",pairSqr.x,pairSqr.y,curr_board[pairSqr.x][pairSqr.y].magnet_value,curr_board[pairSqr.x][pairSqr.y].value )
+        
+        # if curr_board[sqr.x][sqr.y].magnet_value in curr_board[sqr.x][sqr.y].domain_square:
+            
+        #     curr_board[sqr.x][sqr.y].domain_square.remove(sqr_value)
+        
+        # if curr_board[pairSqr.x][pairSqr.y].magnet_value in curr_board[pairSqr.x][pairSqr.y].domain_square:
+           
+        #     curr_board[pairSqr.x][pairSqr.y].domain_square.remove(pair_value)
+        #if is_consistent(curr_board,curr_board[pairSqr.x][pairSqr.y],curr_board[pairSqr.x][pairSqr.y]):
+        if(backTrack_Csp(curr_board)):
+            return True
+    return False
 
 
 
