@@ -120,28 +120,44 @@ def is_consistent(board,sqr,pairSqr):  ## check satisfaction for rows and cols a
     n_row =0
     p_col=0
     n_col=0
+    all_row_sqrs_assigned=True    # a flag that checks if a row is complete and there is an unconsistency returns false
+    all_col_sqrs_assigned=True    # a flag that checks if a col is complete and there is an unconsistency returns false
+
     if check_consistency_with_neibours(board,sqr,pairSqr) == False :  ### check if there is an unconsistency such as -- or ++ in neibours
         return False
 
     for i in range(0,n):  ## rows ## check satisfaction for rows 
         p_row=0
         n_row=0
+        all_row_sqrs_assigned=True
         for j in range(0,m):
             if board[i][j].magnet_value=='+': p_row+=1
             if board[i][j].magnet_value=='-': n_row+=1
-        if p_row>Board.row_positive_bound[i] or n_row >Board.row_negative_bound[i]:
-            return False
+            if board[i][j].magnet_value==None :   ## row is not assigned completely
+                all_row_sqrs_assigned=False
+        if(all_row_sqrs_assigned): # ## row is assigned completely:
+            if p_row != Board.row_positive_bound[i] or n_row != Board.row_negative_bound[i]:
+                return False
+        else:  ## row is not assigned completely
+            if p_row>Board.row_positive_bound[i] or n_row >Board.row_negative_bound[i]:
+                return False
 
 
     for j in range(0,m): ## cols ## check satisfaction for cols
         p_col=0
         n_col=0
+        all_col_sqrs_assigned=True
         for i in range (0,n):
             if board[i][j].magnet_value=='+': p_col+=1
             if board[i][j].magnet_value=='-': n_col+=1
+            if board[i][j].magnet_value==None: all_col_sqrs_assigned = False ## col is not assigned completely
 
-        if p_col> Board.col_positive_bound[j] or n_col> Board.col_negative_bound[j]:
-            return False
+        if(all_col_sqrs_assigned):## col is assigned completely
+            if p_col != Board.col_positive_bound[j] or n_col != Board.col_negative_bound[j]:
+                return False
+        else: ## col is not assigned completely
+            if p_col> Board.col_positive_bound[j] or n_col> Board.col_negative_bound[j]:
+                return False
 
     return True 
 
