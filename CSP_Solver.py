@@ -113,7 +113,7 @@ def get_neibours(board,sqr):  ### get all neibours for a sqr
 
 
 
-def is_consistent(board,sqr,pairSqr):  ## check satisfaction for rows and cols and ++ or -- in neibours
+def is_consistent(board,sqr,pairSqr):  ## check satisfactilon for rows and cols and ++ or -- in neibours
     n = len(board)  ## rows
     m = len(board[0])  ## cols
     p_row =0
@@ -197,13 +197,69 @@ def satisfaction_test(board):  ## check if constraint for each row and col is sa
 def forward_check(board,sqr,pairSqr):
     sqr_neighbors=get_neibours(board,sqr)
     pairSqr_neighbors=get_neibours(board,pairSqr)
-    print("sqr_neighbors , pairSqr_neighbors: ",sqr_neighbors,pairSqr_neighbors)
+    #print("sqr_neighbors , pairSqr_neighbors: ",sqr_neighbors,pairSqr_neighbors)
     for i in range(0,len(sqr_neighbors)): # FC for sqr 
         if sqr.magnet_value in sqr_neighbors[i].domain_square:
             sqr_neighbors[i].domain_square.remove(sqr.magnet_value)
     for i in range(0,len(pairSqr_neighbors)): # FC for pairSqr 
         if pairSqr.magnet_value in pairSqr_neighbors[i].domain_square:
             pairSqr_neighbors[i].domain_square.remove(pairSqr.magnet_value)    
+
+def lcv(board,sqr,pairSqr): # for each var choose value that leads to least constraints fer neihbors  # returns a sorted array as domain
+    sqr_magnet_value=sqr.magnet_value
+    pairSqr_magnet_value = None
+    constraints_list=[]
+    value_constraints_list=[]  ## each value for each constraint
+    constraint = 0
+    sqr_neighbors = get_neibours(board,sqr)
+    pairSqr_neighbors = get_neibours(board,pairSqr)
+    for value in sqr.domain_square:
+        if value == '+':
+            pairSqr_magnet_value='-'
+
+        elif value == '-':
+            pairSqr_magnet_value='+'
+
+        else:      # '0' 
+            pairSqr_magnet_value='0'  
+
+        constraint=0 
+
+        for neighbor in sqr_neighbors:  ## check if sqr neighbors have cinstraint with pair sqr value
+            if pairSqr_magnet_value in neighbor.domain_square:
+                constraint+=1
+                if len(neighbor.domain_square) ==1 :  ## if a neighbor has one value in domain and it leads to constraint so its a really bad move
+                    constraint +=1000
+        for neighbor in pairSqr_neighbors:## check if pair sqr neighbors have cinstraint with  sqr value
+            if sqr_magnet_value in neighbor.domain_square:
+                constraint+=1
+            if len(neighbor.domain_square)==1 :  ## if a neighbor has one value in domain and it leads to constraint so its a really bad move
+                    constraint +=1000
+
+        constraints_list.append(constraint)
+        value_constraints_list.append(value)
+    new_sqr_domain=[] # sorted domain based on lcv
+    for i in range(0,len(constraints_list)-1): # sort constraints_list and value_constraints_list
+        for j in range(i+1,len(constraints_list)):
+            if constraints_list[i]>constraints_list[j]: ## j is less
+                t = constraints_list[i]
+                constraints_list[i] = constraints_list[j]
+                constraints_list[j]=t
+
+                t = value_constraints_list[i]
+                value_constraints_list[i] = value_constraints_list[j]
+                value_constraints_list[j]=t
+
+    # after sort we have to fill new_sqr_domain
+    for i in range(0,len(value_constraints_list)):
+        if value_constraints_list[i] not in new_sqr_domain: # if value is not added yet
+            new_sqr_domain.append(value_constraints_list[i])
+        if len(new_sqr_domain)==3: break # stop after filling    new_sqr_domain becuase length is 3 : + - 0 
+
+    sqr.domain_square = new_sqr_domain  ## assign new domain to sqr
+   # print("sqr.domain_square in lcv : ",sqr.domain_square)
+
+
 
 
 
@@ -221,12 +277,13 @@ def backTrack_Csp(board):
     pairSqr = get_the_pair(sqr,board)   # get the pair for this var
     if not is_consistent(board,sqr,pairSqr): ## check satisfaction for rows and cols and ++ or -- in neibours
         return False
-    print("Sqr : ",sqr.x,sqr.y,sqr.value)
-    print("pairSqr : ",pairSqr.x,pairSqr.y,pairSqr.value)
-    print(" domain fo sqr: ",sqr.domain_square)
-    print(" domain of pairsqr: ",pairSqr.domain_square)
+    # print("Sqr : ",sqr.x,sqr.y,sqr.value)
+    # print("pairSqr : ",pairSqr.x,pairSqr.y,pairSqr.value)
+    # print(" domain fo sqr: ",sqr.domain_square)
+    # print(" domain of pairsqr: ",pairSqr.domain_square)
 
     ### iterate the domain : 
+    lcv(board,sqr,pairSqr) ## change domain by lcv heuristic to choose lcv
     for i in range (len(sqr.domain_square)):
     
         sqr_value = board[sqr.x][sqr.y].domain_square[i]
@@ -244,9 +301,9 @@ def backTrack_Csp(board):
         curr_board[sqr.x][sqr.y].magnet_value = sqr_value  ## sqr_copy
         curr_board[pairSqr.x][pairSqr.y].magnet_value = pair_value  ##pairSqr_copy
        
-        print_board(curr_board)
-        print("curr sgr value : ",curr_board[sqr.x][sqr.y].magnet_value )
-        print("curr pairsgr value : ",curr_board[pairSqr.x][pairSqr.y].magnet_value)
+        # print_board(curr_board)
+        # print("curr sgr value : ",curr_board[sqr.x][sqr.y].magnet_value )
+        # print("curr pairsgr value : ",curr_board[pairSqr.x][pairSqr.y].magnet_value)
 
         ## remove these values from domain
        
