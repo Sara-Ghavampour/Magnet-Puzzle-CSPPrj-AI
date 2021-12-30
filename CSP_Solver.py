@@ -113,6 +113,26 @@ def get_neibours(board,sqr):  ### get all neibours for a sqr
 
 
 
+def get_unAssigned_neibours(board,sqr):  ### get all neibours for a sqr # neighbor doesnt have a value yet
+    n = len(board)
+    m = len(board[0])
+    x= sqr.x
+    y=sqr.y
+    neibours=[]
+
+    if sqr.magnet_value!=None :   # if we assigned to this variable(sqr) -> now we can return the neibours for upcoming uses in forward check
+        if x-1>=0 and board[x-1][y].magnet_value== None : # left neibour
+            neibours.append(board[x-1][y])
+        elif x+1<n and board[x+1][y].magnet_value== None  : # right neibour
+            neibours.append(board[x+1][y])
+        elif y-1>=0 and board[x][y-1].magnet_value== None:# downside neibour 
+            neibours.append(board[x][y-1])
+        elif y+1<n and board[x][y+1].magnet_value== None : # upside neibour 
+            neibours.append(board[x][y+1])
+
+    return neibours
+
+
 def is_consistent(board,sqr,pairSqr):  ## check satisfactilon for rows and cols and ++ or -- in neibours
     n = len(board)  ## rows
     m = len(board[0])  ## cols
@@ -204,6 +224,31 @@ def forward_check(board,sqr,pairSqr):
     for i in range(0,len(pairSqr_neighbors)): # FC for pairSqr 
         if pairSqr.magnet_value in pairSqr_neighbors[i].domain_square:
             pairSqr_neighbors[i].domain_square.remove(pairSqr.magnet_value)    
+
+
+def ac_3(board):
+    contradiction = False  
+    queue = []  # queue that stores variables (board[i][j] == sqr)
+    for i in range(0,len(board)):
+        for j in range(0 , len(board[0])):
+            if board[i][j].magnet_value == None : queue.append(board[i][j])
+    while(len(queue)>0 and not contradiction):
+        x = queue.pop(0)
+        x_neighbors = get_unAssigned_neibours(board,x)
+        # for y in x_neighbors: # y is a variable related to x by a binary constraint (here we shlould use neighbours)
+        #   if  remove_value(x,y):
+
+def remove_value(x,y):
+    removed = False
+    u_found= False
+    for v in y.domain_square:
+        if v =='+': u = '-'
+        elif v=='-': u='+'
+        else : u='0'
+
+        if x.domain_square                                                                        
+    
+
 
 def lcv(board,sqr,pairSqr): # for each var choose value that leads to least constraints fer neihbors  # returns a sorted array as domain
     sqr_magnet_value=sqr.magnet_value

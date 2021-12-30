@@ -3,6 +3,7 @@
 from square import *
 from Board import *
 from CSP_Solver import *
+from time import time
 
 def main():
     input_lines=open("input2.txt").readlines()
@@ -35,8 +36,10 @@ def main():
     # print("row_negative_bound: ",Board.row_negative_bound)
     # print("col_positive_bound: ",Board.col_positive_bound)
     # print("col_negative_bound: ",Board.col_negative_bound)
-
+    start = time()    
     backTrack_Csp(Board.board)
+    end = time()
+    print("time: ",end-start)
 
 
 def print_board(board):
