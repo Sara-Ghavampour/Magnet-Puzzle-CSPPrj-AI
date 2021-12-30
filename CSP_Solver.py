@@ -215,16 +215,20 @@ def satisfaction_test(board):  ## check if constraint for each row and col is sa
     return True         
 
 def forward_check(board,sqr,pairSqr):
+    
     sqr_neighbors=get_neibours(board,sqr)
     pairSqr_neighbors=get_neibours(board,pairSqr)
     #print("sqr_neighbors , pairSqr_neighbors: ",sqr_neighbors,pairSqr_neighbors)
     for i in range(0,len(sqr_neighbors)): # FC for sqr 
         if sqr.magnet_value in sqr_neighbors[i].domain_square:
             sqr_neighbors[i].domain_square.remove(sqr.magnet_value)
+            #if len(sqr_neighbors[i].domain_square)==0: return False
+
     for i in range(0,len(pairSqr_neighbors)): # FC for pairSqr 
         if pairSqr.magnet_value in pairSqr_neighbors[i].domain_square:
-            pairSqr_neighbors[i].domain_square.remove(pairSqr.magnet_value)    
-
+            pairSqr_neighbors[i].domain_square.remove(pairSqr.magnet_value)   
+            #if  len(pairSqr_neighbors[i].domain_square)==0 : return False
+   # return True    
 
 def ac_3(board):
     contradiction = False  
@@ -235,18 +239,25 @@ def ac_3(board):
     while(len(queue)>0 and not contradiction):
         x = queue.pop(0)
         x_neighbors = get_unAssigned_neibours(board,x)
-        # for y in x_neighbors: # y is a variable related to x by a binary constraint (here we shlould use neighbours)
-        #   if  remove_value(x,y):
+        for y in x_neighbors: # y is a variable related to x by a binary constraint (here we shlould use neighbours)
+          if  remove_value(x,y):
+              if len(y.domain_square)==0 : contradiction= True  # i y's domain is empty ->
+              queue.append(y)
 
 def remove_value(x,y):
     removed = False
     u_found= False
     for v in y.domain_square:
+        u_found= False
         if v =='+': u = '-'
         elif v=='-': u='+'
         else : u='0'
 
-        if x.domain_square                                                                        
+        if u in  x.domain_square: u_found=True
+        if not u_found: # if u_found is false means there is no u for this v that stisfies the constraint
+            y.domain_square.remove(v)
+            removed = True
+    return removed
     
 
 
@@ -318,8 +329,10 @@ def backTrack_Csp(board):
     if all_checked(board): ## check if there is a variable that we didnt assign it's value
         return False
     sqr = mrv_Heuristic(board)   # select a variable via mrv heuristic
-          
     pairSqr = get_the_pair(sqr,board)   # get the pair for this var
+
+    if sqr.x ==0 and sqr.y ==0 :
+        ac_3(board)
     if not is_consistent(board,sqr,pairSqr): ## check satisfaction for rows and cols and ++ or -- in neibours
         return False
     # print("Sqr : ",sqr.x,sqr.y,sqr.value)
@@ -360,6 +373,7 @@ def backTrack_Csp(board):
            
             curr_board[pairSqr.x][pairSqr.y].domain_square.remove(curr_board[pairSqr.x][pairSqr.y].magnet_value )
         #if is_consistent(curr_board,curr_board[pairSqr.x][pairSqr.y],curr_board[pairSqr.x][pairSqr.y]):
+        #if  forward_check(curr_board,curr_board[sqr.x][sqr.y],curr_board[pairSqr.x][pairSqr.y]) :
         forward_check(curr_board,curr_board[sqr.x][sqr.y],curr_board[pairSqr.x][pairSqr.y])
         if(backTrack_Csp(curr_board)):
             return True
