@@ -6,7 +6,7 @@ from CSP_Solver import *
 from time import time
 
 def main():
-    input_lines=open("input.txt").readlines()
+    input_lines=open("input2.txt").readlines()
     n,m=input_lines[0].split()[0],input_lines[0].split()[1]
     row_positive_bound=[int(number)for number in input_lines[1].split()]
     row_negative_bound=[int(number)for number in input_lines[2].split()]

@@ -376,6 +376,6 @@ def backTrack_Csp(board):
         #if  forward_check(curr_board,curr_board[sqr.x][sqr.y],curr_board[pairSqr.x][pairSqr.y]) :
         forward_check(curr_board,curr_board[sqr.x][sqr.y],curr_board[pairSqr.x][pairSqr.y])
         if(backTrack_Csp(curr_board)):
-            return True
+                return True
     return False
 
