@@ -1,63 +1,45 @@
-######### sara Ghavampour   9812762781
-
-from square import *
-from Board import *
-from CSP_Solver import *
+from state import *
+from csp import *
 from time import time
 
-def main():
-    input_lines=open("input2.txt").readlines()
-    n,m=input_lines[0].split()[0],input_lines[0].split()[1]
-    row_positive_bound=[int(number)for number in input_lines[1].split()]
-    row_negative_bound=[int(number)for number in input_lines[2].split()]
-    col_positive_bound=[int(number)for number in input_lines[3].split()]
-    col_negative_bound=[int(number)for number in input_lines[4].split()]
 
+if __name__ == "__main__":
+    
+    input_numbers = []
+    input = open('input.txt').readlines()
+    for line in input:
+        line = line.rstrip()
+        numbers = line.split(' ')
+        n = [int(number) for number in numbers]
+        input_numbers.append(n)
+    
+    
+    n, m = input_numbers[0]   
+    bound_y = input_numbers[1:3]
+    bound_x = input_numbers[3:5]
+    
+    State.bound_y = bound_y
+    State.bound_x = bound_x
+    
+    domain = []
+    for i in range(0, n):
+        d = []
+        for j in range (0, m):
+            d.append(['-', '+', ' '])
+        domain.append(d)
+            
+    board = input_numbers[5:]
+    
+    State.board = board
+    State.domain = domain
 
-    Board.row_positive_bound=row_positive_bound
-    Board.row_negative_bound=row_negative_bound
-    Board.col_positive_bound=col_positive_bound
-    Board.col_negative_bound=col_negative_bound
-    for i in range(5,len(input_lines)):
-        row = [int(number)for number in input_lines[i].split()]
-        sqr_list=[]
-        for j in range(0,len(row)):
-            sqr = square(i-5,j,row[j])
-            sqr_list.append(sqr)
+    # print(domain)
+    
+    start_time = time()
+    backtrack(board, domain)
+    end_time = time()
+    
+    print('total time: ', end_time-start_time)
+    
 
-        Board.board.append(sqr_list)
-
-
-    #print_board(Board.board)   
-
-
-    # print("n , m : ",n, m )
-    # print("row_positive_bound: ",Board.row_positive_bound)
-    # print("row_negative_bound: ",Board.row_negative_bound)
-    # print("col_positive_bound: ",Board.col_positive_bound)
-    # print("col_negative_bound: ",Board.col_negative_bound)
-    start = time()    
-    backTrack_Csp(Board.board)
-    end = time()
-    print("time: ",end-start)
-
-
-def print_board(board):
-    for i in range (len(board)):
-        print("row ",i ," : ")
-        for j in range(len(board[0])):
-            print(board[i][j].value,end=" ")
-        print()    
-
-
-
-
-
-if __name__== "__main__":
-    main()
-
-
-
-
-
-
+    
